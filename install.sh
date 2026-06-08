@@ -111,6 +111,7 @@ can_sys_install() { [ "$PRIV" != none ] && [ -n "$PKG" ]; }
 # Paths
 # ---------------------------------------------------------------------------
 BIN_DIR="$HOME/.local/bin"
+ZSH_PLUGIN_DIR="$HOME/.config/zsh/plugins"
 
 ensure_dirs() {
   mkdir -p "$BIN_DIR" "$HOME/.config"
@@ -358,6 +359,49 @@ install_tools() {
 }
 
 # ---------------------------------------------------------------------------
+# zsh plugins (git-cloned into ~/.config/zsh/plugins, sourced from ~/.zshrc)
+# ---------------------------------------------------------------------------
+clone_or_update() {
+  local url="$1" dest="$2" name; name="$(basename "$dest")"
+  if [ -d "$dest/.git" ]; then
+    git -C "$dest" pull --ff-only --quiet 2>/dev/null || true
+    skip "$name (already cloned)"
+  elif git clone --depth 1 --quiet "$url" "$dest" 2>/dev/null; then
+    ok "$name"
+  else
+    warn "could not clone $name from $url"
+    return 1
+  fi
+}
+
+# The oh-my-zsh sudo plugin is a single self-contained file.
+ensure_sudo_plugin() {
+  local f="$ZSH_PLUGIN_DIR/sudo/sudo.plugin.zsh"
+  if [ -f "$f" ]; then skip "sudo plugin"; return 0; fi
+  mkdir -p "$(dirname "$f")"
+  if dl https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins/sudo/sudo.plugin.zsh -o "$f"; then
+    ok "sudo plugin"
+  else
+    rm -f "$f"
+    warn "could not download oh-my-zsh sudo plugin"
+    return 1
+  fi
+}
+
+install_plugins() {
+  step "Installing zsh plugins"
+  if ! have git; then
+    warn "git is unavailable; skipping zsh plugins"
+    return 0
+  fi
+  mkdir -p "$ZSH_PLUGIN_DIR"
+  clone_or_update https://github.com/zsh-users/zsh-autosuggestions             "$ZSH_PLUGIN_DIR/zsh-autosuggestions"      || true
+  clone_or_update https://github.com/zdharma-continuum/fast-syntax-highlighting "$ZSH_PLUGIN_DIR/fast-syntax-highlighting" || true
+  clone_or_update https://github.com/Aloxaf/fzf-tab                             "$ZSH_PLUGIN_DIR/fzf-tab"                  || true
+  ensure_sudo_plugin || true
+}
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 main() {
@@ -381,6 +425,7 @@ main() {
   fi
 
   install_tools
+  install_plugins
 }
 
 main "$@"
