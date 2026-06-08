@@ -14,14 +14,18 @@ That's it. When it finishes, run `exec zsh` (or open a new terminal) and you're 
 
 - **Shell:** `zsh`, set as the default login shell.
 - **Prompt:** [Starship](https://starship.rs) — a fast, git-aware two-line prompt
-  (`┌──(user)-[dir]` / `└─$`) that always shows branch + ahead/behind + dirty state.
+  (`┌──(user@host)-[dir]` / `└─$`) that always shows branch, ahead/behind, and
+  dirty/staged/stash/rebase state inside a repo.
 - **zsh plugins:** `zsh-autosuggestions`, `fast-syntax-highlighting`, `fzf-tab`,
   and the oh-my-zsh `sudo` plugin.
 - **CLI tools:** `fzf` (fuzzy finder), `zoxide` (smart `cd`), `atuin` (shell
-  history), `bat` (`cat`), `eza` (`ls`), `fd` (`find`), `ripgrep` (`grep`),
-  `delta` (git pager), plus `tmux`, `vim`, `git`, and `curl`.
-- **Dotfiles:** `~/.zshrc`, `~/.config/starship.toml`, `~/.tmux.conf`, `~/.vimrc`
-  (with the afterglow colorscheme), all written from the script itself.
+  history), `bat` (`cat`) + bat-extras (`batman`/`batdiff`), `eza` (`ls`),
+  `fd` (`find`), `ripgrep` (`grep`), `delta` (git pager), plus `tmux`, `vim`,
+  `git`, and `curl`.
+- **Dotfiles:** `~/.zshrc`, `~/.config/starship.toml`, `~/.tmux.conf` (tpm +
+  gruvbox), `~/.vimrc` (with the afterglow colorscheme), all written from the
+  script itself. Handy aliases: `ls`→`eza`, `cat`→`bat`, `man`→`batman`,
+  `diff`→`batdiff`, and `cp`/`rm`/`mv` made interactive (`-i`).
 - **Font:** Hack Nerd Font (so prompt/glyphs render correctly).
 
 It is a **CLI-only** setup — it never touches GUI/desktop settings. Dark theme
@@ -29,15 +33,20 @@ throughout.
 
 ## Supported systems
 
-- **Distros:** Debian/Ubuntu (`apt`), Fedora/RHEL (`dnf`), Arch (`pacman`),
+- **Distros:** Debian/Ubuntu (`apt`), Fedora/RHEL (`dnf`/`yum`), Arch (`pacman`),
   openSUSE (`zypper`), Alpine (`apk`).
 - **Architectures:** `x86_64` and `aarch64`/`armv7` (e.g. Raspberry Pi).
-- **No root?** No problem. If neither root nor `sudo` is available, tools are
-  installed user-locally into `~/.local/bin` and the script proceeds.
+- **No root?** No problem. The modern CLI tools fall back to prebuilt release
+  binaries dropped into `~/.local/bin`, and `chsh` is replaced by a guarded
+  launcher appended to `~/.bashrc`/`~/.profile`. (`zsh`, `tmux`, `vim` and `git`
+  still need a package manager; if one isn't reachable they're skipped with a
+  warning and everything else proceeds.)
 
 The script is **idempotent** (safe to re-run) and **pipe-safe** (never blocks on
 a prompt when run via `curl … | bash`). Any existing dotfile is backed up to
-`<file>.bak` once before being overwritten.
+`<file>.bak` once before being overwritten. Set `GITHUB_TOKEN` (optional) to lift
+GitHub's anonymous API rate limit if you hit it while downloading release
+binaries.
 
 ## Inspect before you run
 
