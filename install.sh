@@ -9,9 +9,9 @@
 # with dotfiles written from the heredocs embedded in this very file.
 #
 # Design notes:
-#   - Self-contained: the source repo is private, so a fresh box cannot clone
-#     it. Everything this script needs is baked in here; deployment is just
-#     publishing this one file to sh.pgj11.com.
+#   - Self-contained: every dotfile is embedded below, so a fresh box needs
+#     nothing but this single file. sh.pgj11.com redirects to its raw contents
+#     on GitHub.
 #   - Idempotent: safe to re-run; already-installed pieces are skipped.
 #   - Pipe-safe: when run via `curl ... | bash` it never blocks on a prompt.
 #   - Cross-distro (apt/dnf/pacman/zypper/apk) and cross-arch (x86_64/aarch64/

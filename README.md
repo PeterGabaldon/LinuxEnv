@@ -61,11 +61,11 @@ bash install.sh        # run it once you're happy
 
 ## How deployment works
 
-This repository is **private**, so a fresh box can't clone it and
-`raw.githubusercontent.com` won't work without credentials. To keep
-`curl sh.pgj11.com | bash` credential-free, `install.sh` is fully
-**self-contained** — every dotfile is embedded in the script itself.
+`install.sh` is fully **self-contained** — every dotfile is embedded in the
+script itself, so a fresh box needs nothing but this one file (no repo checkout,
+no extra config downloads).
 
-Deployment is just publishing that one file: the contents of `install.sh` are
-served at `sh.pgj11.com` as plain text. This repo is the editing/source home;
-whenever `install.sh` changes, it gets re-published to that endpoint.
+`sh.pgj11.com` is simply a redirect to the raw contents of `install.sh` on
+GitHub, so `curl sh.pgj11.com | bash` always fetches the latest committed
+version. This repo is the source of truth; pushing a change to `install.sh` is
+the deploy.
