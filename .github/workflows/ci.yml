@@ -17,7 +17,7 @@ jobs:
     name: Lint (shellcheck + syntax)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Run shellcheck and bash syntax check
         env:
           SHELLCHECK_VERSION: v0.11.0   # pinned so CI and local runs never drift
@@ -47,7 +47,7 @@ jobs:
           - image: "alpine:latest"
             bootstrap: "apk add --no-cache bash curl ca-certificates"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Run install.sh and verify on ${{ matrix.image }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
