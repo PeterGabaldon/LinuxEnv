@@ -1,4 +1,6 @@
-# shell-env
+# LinuxEnv
+
+[![CI](https://github.com/PeterGabaldon/LinuxEnv/actions/workflows/ci.yml/badge.svg)](https://github.com/PeterGabaldon/LinuxEnv/actions/workflows/ci.yml)
 
 One command turns a fresh Linux box into my preferred **zsh** command-line
 environment: a modern git-aware prompt, handy interactive zsh plugins, and a set
@@ -58,6 +60,16 @@ curl -fsSL sh.pgj11.com -o install.sh
 less install.sh        # read it
 bash install.sh        # run it once you're happy
 ```
+
+## Continuous integration
+
+Every push and pull request runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+
+- **Lint:** `shellcheck` and a `bash -n` syntax check of `install.sh`.
+- **Cross-distro install:** the installer runs to completion (as root) in fresh
+  Ubuntu, Debian, Fedora, Arch, and Alpine containers, then the workflow asserts
+  the dotfiles were written, the core tools are on `PATH`, and the generated
+  `~/.zshrc` and `starship.toml` parse.
 
 ## How deployment works
 

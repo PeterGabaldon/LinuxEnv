@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint (shellcheck + syntax)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run shellcheck and bash syntax check
+        run: |
+          if ! command -v shellcheck >/dev/null 2>&1; then
+            sudo apt-get update -y && sudo apt-get install -y shellcheck
+          fi
+          shellcheck --version
+          shellcheck install.sh
+          bash -n install.sh
+
+  integration:
+    name: Install on ${{ matrix.image }}
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: "ubuntu:latest"
+            bootstrap: "apt-get update -y && apt-get install -y --no-install-recommends bash curl ca-certificates"
+          - image: "debian:stable"
+            bootstrap: "apt-get update -y && apt-get install -y --no-install-recommends bash curl ca-certificates"
+          - image: "fedora:latest"
+            bootstrap: "dnf -y install bash curl ca-certificates"
+          - image: "archlinux:latest"
+            bootstrap: "pacman -Sy --noconfirm --needed bash curl ca-certificates"
+          - image: "alpine:latest"
+            bootstrap: "apk add --no-cache bash curl ca-certificates"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run install.sh and verify on ${{ matrix.image }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          docker run --rm -v "$PWD":/src -w /src -e GITHUB_TOKEN \
+            "${{ matrix.image }}" sh -c '
+              set -eu
+              ${{ matrix.bootstrap }}
+
+              # Run the installer as root (exercises the package-manager path).
+              bash install.sh
+
+              # The downloaded binaries land in ~/.local/bin.
+              export PATH="$HOME/.local/bin:$PATH"
+
+              echo "----- verifying dotfiles -----"
+              for f in "$HOME/.zshrc" "$HOME/.config/starship.toml" "$HOME/.tmux.conf" "$HOME/.vimrc"; do
+                [ -f "$f" ] || { echo "MISSING FILE: $f"; exit 1; }
+              done
+
+              echo "----- verifying tools -----"
+              for c in zsh starship fzf eza bat fd rg zoxide delta; do
+                command -v "$c" >/dev/null 2>&1 || { echo "MISSING COMMAND: $c"; exit 1; }
+              done
+
+              echo "----- verifying generated configs parse -----"
+              zsh -n "$HOME/.zshrc"
+              starship print-config >/dev/null
+
+              echo "INTEGRATION OK: ${{ matrix.image }}"
+            '
