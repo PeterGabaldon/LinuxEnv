@@ -19,12 +19,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run shellcheck and bash syntax check
+        env:
+          SHELLCHECK_VERSION: v0.11.0   # pinned so CI and local runs never drift
         run: |
-          if ! command -v shellcheck >/dev/null 2>&1; then
-            sudo apt-get update -y && sudo apt-get install -y shellcheck
-          fi
-          shellcheck --version
-          shellcheck install.sh
+          curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" | tar -xJ
+          SC="shellcheck-${SHELLCHECK_VERSION}/shellcheck"
+          "$SC" --version
+          "$SC" install.sh
           bash -n install.sh
 
   integration:

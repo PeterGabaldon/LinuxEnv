@@ -661,7 +661,7 @@ install_font() {
   tmp="$(mktemp -d)"
   if dl "$url" -o "$tmp/Hack.tar.xz" && tar -xJf "$tmp/Hack.tar.xz" -C "$fdir" 2>/dev/null; then
     ok "Hack Nerd Font"
-    have fc-cache && fc-cache -f "$fdir" >/dev/null 2>&1 || true
+    if have fc-cache; then fc-cache -f "$fdir" >/dev/null 2>&1 || true; fi
   else
     warn "could not install Hack Nerd Font"
   fi
@@ -783,12 +783,16 @@ main() {
   detect_privilege
   ensure_dirs
 
-  step "shell-env installer"
+  local mode="non-interactive (piped)" priv="$PRIV"
+  if [ "$INTERACTIVE" -eq 1 ]; then mode="interactive"; fi
+  if [ -n "$SUDO" ]; then priv="$priv (via sudo)"; fi
+
+  step "LinuxEnv installer"
   info "OS:           $OS_NAME ($OS_ID)"
   info "Package mgr:  ${PKG:-none detected}"
   info "Architecture: $ARCH (uname -m: $(uname -m))"
-  info "Privilege:    $PRIV$([ -n "$SUDO" ] && echo " (via sudo)")"
-  info "Mode:         $([ "$INTERACTIVE" -eq 1 ] && echo interactive || echo "non-interactive (piped)")"
+  info "Privilege:    $priv"
+  info "Mode:         $mode"
   if can_sys_install; then
     info "Install path: system packages via $PKG${SUDO:+ (sudo)}, user-local fallback"
   else
