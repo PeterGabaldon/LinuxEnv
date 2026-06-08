@@ -678,6 +678,101 @@ install_dotfiles() {
 }
 
 # ---------------------------------------------------------------------------
+# Default shell
+# ---------------------------------------------------------------------------
+# The login shell currently recorded for this user in the passwd database.
+current_login_shell() {
+  local u; u="${USER:-$(id -un)}"
+  if have getent; then
+    getent passwd "$u" 2>/dev/null | awk -F: '{print $NF}'
+  else
+    awk -F: -v u="$u" '$1==u {print $NF}' /etc/passwd 2>/dev/null
+  fi
+}
+
+# chsh refuses shells that are not listed in /etc/shells; add it if we can.
+ensure_in_etc_shells() {
+  local sh="$1"
+  [ -r /etc/shells ] || return 0
+  grep -qxF "$sh" /etc/shells 2>/dev/null && return 0
+  if [ "$PRIV" = root ]; then
+    printf '%s\n' "$sh" >> /etc/shells
+  elif [ -n "$SUDO" ]; then
+    printf '%s\n' "$sh" | sudo tee -a /etc/shells >/dev/null 2>&1 || true
+  fi
+}
+
+# Try to change the login shell without ever blocking when piped.
+try_chsh() {
+  local sh="$1" u; u="${USER:-$(id -un)}"
+  if [ "$PRIV" = root ]; then
+    chsh -s "$sh" "$u" >/dev/null 2>&1
+  elif [ -n "$SUDO" ] && sudo -n true 2>/dev/null; then
+    sudo chsh -s "$sh" "$u" >/dev/null 2>&1
+  elif [ "$INTERACTIVE" -eq 1 ]; then
+    chsh -s "$sh" >/dev/null 2>&1
+  else
+    return 1
+  fi
+}
+
+# Fallback when chsh is unavailable: hand off to zsh from the bash startup files
+# for interactive shells only (guarded, idempotent, harmless to scripts).
+add_exec_zsh_guard() {
+  local marker="# >>> shell-env: launch zsh >>>" f
+  for f in "$HOME/.bashrc" "$HOME/.profile"; do
+    if [ -f "$f" ] && grep -qF "$marker" "$f" 2>/dev/null; then
+      skip "zsh launcher already present in $(tilde "$f")"; continue
+    fi
+    backup_once "$f"
+    # The single-quoted lines are written verbatim into the rc file on purpose.
+    # shellcheck disable=SC2016
+    {
+      printf '\n%s\n' "$marker"
+      printf '%s\n' 'if [ -z "$ZSH_VERSION" ] && command -v zsh >/dev/null 2>&1; then'
+      printf '%s\n' '  case $- in *i*) exec zsh ;; esac'
+      printf '%s\n' 'fi'
+      printf '%s\n' "# <<< shell-env: launch zsh <<<"
+    } >> "$f"
+    ok "added zsh launcher to $(tilde "$f")"
+  done
+}
+
+DEFAULT_SHELL_NOTE=""   # message appended to the final summary
+set_default_shell() {
+  step "Setting zsh as the default shell"
+  local zsh_path; zsh_path="$(command -v zsh 2>/dev/null || true)"
+  if [ -z "$zsh_path" ]; then
+    warn "zsh is not installed; skipping default-shell change"
+    return 0
+  fi
+  if [ "$(current_login_shell)" = "$zsh_path" ]; then
+    skip "zsh is already the default shell"
+    return 0
+  fi
+  ensure_in_etc_shells "$zsh_path"
+  if try_chsh "$zsh_path"; then
+    ok "default shell changed to $zsh_path"
+    DEFAULT_SHELL_NOTE="Your default shell is now zsh (takes effect on next login)."
+  else
+    warn "couldn't run chsh here; using a startup-file launcher instead"
+    add_exec_zsh_guard "$zsh_path"
+    DEFAULT_SHELL_NOTE="zsh will start automatically from your existing shell (chsh was unavailable)."
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Summary
+# ---------------------------------------------------------------------------
+print_summary() {
+  step "All done — no reboot needed"
+  info "Start your new shell now with:  ${C_BOLD}exec zsh${C_RESET}"
+  info "…or simply open a new terminal."
+  [ -n "$DEFAULT_SHELL_NOTE" ] && info "$DEFAULT_SHELL_NOTE"
+  info "Tip: terminal glyphs need a Nerd Font — set your terminal to \"Hack Nerd Font\"."
+}
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 main() {
@@ -703,6 +798,8 @@ main() {
   install_tools
   install_plugins
   install_dotfiles
+  set_default_shell
+  print_summary
 }
 
 main "$@"
