@@ -37,7 +37,9 @@ That's it. When it finishes, run `exec zsh` (or open a new terminal) and you're 
   `bat` (`~/.config/bat/themes/`), all written from the script itself. Handy
   aliases: `ls`→`eza`, `cat`→`bat`, `man`→`batman`, `diff`→`batdiff`, and
   `cp`/`rm`/`mv` made interactive (`-i`).
-- **Font:** Hack Nerd Font (so prompt/glyphs render correctly).
+- **Font:** Hack Nerd Font (so prompt/glyphs render correctly). On **WSL** (or any
+  remote/SSH session) the font must be installed on the machine running the
+  *terminal*, not inside Linux — see the WSL note below.
 
 It is a **CLI-only** setup — it never touches GUI/desktop settings. Dark theme
 throughout.
@@ -137,6 +139,18 @@ one thing you need to know to start using it.
 - **Hack Nerd Font** — supplies the glyphs the prompt and eza icons expect. *Why:*
   icons and prompt symbols render correctly. *Usage:* set your terminal font to
   "Hack Nerd Font".
+
+  > **WSL / SSH note:** glyphs are drawn by whatever program renders the terminal,
+  > which on **WSL is the Windows terminal app** (Windows Terminal, etc.) — *not*
+  > WSL. A Nerd Font installed inside the Linux filesystem (where this script puts
+  > it) is invisible to it, so the icons show as boxes/tofu. Install Hack Nerd Font
+  > **on Windows** (download `Hack.zip` from the
+  > [nerd-fonts releases](https://github.com/ryanoasis/nerd-fonts/releases), unzip,
+  > select the `.ttf` files → right-click → *Install*), then set the terminal's
+  > font face to **`Hack Nerd Font Mono`** (Windows Terminal: Settings → your
+  > profile → Appearance → Font face). The same applies over SSH — install and
+  > select the font in your *local* terminal. tmux inherits the terminal font, so
+  > there's no extra step inside tmux.
 
 ## Continuous integration
 
