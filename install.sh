@@ -748,11 +748,12 @@ bind C-a send-prefix
 unbind C-b
 setw -g mode-keys vi
 
-# Use a 256-colour terminal and pass 24-bit "true colour" through to it, so the
-# gruvbox theme renders its exact palette instead of a washed-out 256-colour
-# approximation (Windows Terminal and most modern terminals support RGB).
+# Use a 256-colour terminal and force 24-bit "true colour" through to it for any
+# outer $TERM (under WSL it can be a bare "xterm", so a name-specific override
+# misses it — use the "*" wildcard). Without this the gruvbox theme's hex colours
+# get crushed to a few ANSI colours and render red/orange instead of gruvbox.
 set -g default-terminal "screen-256color"
-set -ag terminal-overrides ",xterm-256color:RGB,*256col*:RGB"
+set -ag terminal-overrides ",*:RGB"
 # NOTE: no manual status-bg/status-fg here — the gruvbox theme styles the whole
 # status line itself; overriding them left a grey gap in the bar.
 
