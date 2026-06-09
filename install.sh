@@ -731,9 +731,14 @@ set -g prefix C-a
 bind C-a send-prefix
 unbind C-b
 setw -g mode-keys vi
-set -g status-bg colour250
-set -g status-fg colour232
+
+# Use a 256-colour terminal and pass 24-bit "true colour" through to it, so the
+# gruvbox theme renders its exact palette instead of a washed-out 256-colour
+# approximation (Windows Terminal and most modern terminals support RGB).
 set -g default-terminal "screen-256color"
+set -ag terminal-overrides ",xterm-256color:RGB,*256col*:RGB"
+# NOTE: no manual status-bg/status-fg here — the gruvbox theme styles the whole
+# status line itself; overriding them left a grey gap in the bar.
 
 # tpm
 # List of plugins
