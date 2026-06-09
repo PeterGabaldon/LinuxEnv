@@ -553,7 +553,7 @@ write_starship() {
 #   ┌──  <os user>  <dir>  <git>  <langs>  <docker/conda>  <time>
 #   └─$
 # The powerline glyphs and the `└─$` pointer (instead of the usual arrow)
-# require a Nerd Font — the installer sets up Hack Nerd Font for this.
+# require a Nerd Font — the installer sets up UbuntuMono Nerd Font for this.
 
 format = """
 [┌──](bold color_fg0)\
@@ -820,27 +820,27 @@ install_bat_theme() {
   "$bat_cmd" cache --build >/dev/null 2>&1 || true
 }
 
-# Hack Nerd Font — provides the glyphs the prompt and eza icons expect.
+# UbuntuMono Nerd Font — provides the glyphs the prompt and eza icons expect.
 install_font() {
   local fdir="$HOME/.local/share/fonts" url tmp
-  if find "$fdir" -iname 'HackNerdFont*Regular*.ttf' 2>/dev/null | grep -q .; then
-    skip "Hack Nerd Font"; return 0
+  if find "$fdir" -iname 'UbuntuMonoNerdFont*Regular*.ttf' 2>/dev/null | grep -q .; then
+    skip "UbuntuMono Nerd Font"; return 0
   fi
   url="$(gh_api https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest \
-        | grep -oE '"browser_download_url"[: ]+"[^"]+/Hack\.tar\.xz"' \
+        | grep -oE '"browser_download_url"[: ]+"[^"]+/UbuntuMono\.tar\.xz"' \
         | sed -E 's/.*"(https[^"]+)".*/\1/' | head -n1)" || true
-  if [ -z "$url" ]; then warn "could not find Hack Nerd Font release asset"; return 1; fi
+  if [ -z "$url" ]; then warn "could not find UbuntuMono Nerd Font release asset"; return 1; fi
   if ! ensure_xz; then
-    warn "could not install Hack Nerd Font (xz is unavailable to extract .tar.xz)"
+    warn "could not install UbuntuMono Nerd Font (xz is unavailable to extract .tar.xz)"
     return 1
   fi
   mkdir -p "$fdir"
   tmp="$(mktemp -d)"
-  if dl "$url" -o "$tmp/Hack.tar.xz" && tar -xJf "$tmp/Hack.tar.xz" -C "$fdir" 2>/dev/null; then
-    ok "Hack Nerd Font"
+  if dl "$url" -o "$tmp/UbuntuMono.tar.xz" && tar -xJf "$tmp/UbuntuMono.tar.xz" -C "$fdir" 2>/dev/null; then
+    ok "UbuntuMono Nerd Font"
     if have fc-cache; then fc-cache -f "$fdir" >/dev/null 2>&1 || true; fi
   else
-    warn "could not install Hack Nerd Font"
+    warn "could not install UbuntuMono Nerd Font"
   fi
   rm -rf "$tmp"
 }
@@ -947,7 +947,7 @@ print_summary() {
   info "Start your new shell now with:  ${C_BOLD}exec zsh${C_RESET}"
   info "…or simply open a new terminal."
   [ -n "$DEFAULT_SHELL_NOTE" ] && info "$DEFAULT_SHELL_NOTE"
-  info "Tip: terminal glyphs need a Nerd Font — set your terminal to \"Hack Nerd Font\"."
+  info "Tip: terminal glyphs need a Nerd Font — set your terminal to \"UbuntuMono Nerd Font Mono\"."
 }
 
 # ---------------------------------------------------------------------------
