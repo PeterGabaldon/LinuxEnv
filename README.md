@@ -13,8 +13,9 @@ environment: a modern git-aware prompt, handy interactive zsh plugins, and a set
 of modern CLI tools — no reboot, no manual steps.
 
 ```sh
-curl sh.pgj11.com | bash
+curl -L sh.pgj11.com | bash
 ```
+> -L option is important, as the request is redirected to Github
 
 That's it. When it finishes, run `exec zsh` (or open a new terminal) and you're done.
 
