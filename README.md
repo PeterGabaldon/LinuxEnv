@@ -104,7 +104,8 @@ one thing you need to know to start using it.
   *Usage:* `z proj` jumps to your most-used `…/project`; `zi` picks interactively.
 - **`atuin`** — replaces shell history with a searchable database that also records
   exit code, duration, and directory. *Why:* a far richer, fuzzy-searchable
-  history. *Usage:* press `Ctrl-R` (or `Up`) for the full-screen history search.
+  history. *Usage:* press `Ctrl-R` for the full-screen history search (the Up
+  arrow is left on zsh's normal per-line history).
 - **`bat`** — `cat` with syntax highlighting, line numbers, and git change markers,
   themed with Afterglow to match Vim. *Why:* reading files in the terminal is much
   clearer. *Usage:* `bat file.py` (aliased to `cat`).

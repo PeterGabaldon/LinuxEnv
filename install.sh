@@ -510,8 +510,9 @@ if command -v fzf >/dev/null; then
   fi
 fi
 
-# atuin (shell history) — loaded after fzf so it owns Ctrl-R / Up.
-command -v atuin >/dev/null && eval "$(atuin init zsh)"
+# atuin (shell history) — Ctrl-R only; --disable-up-arrow leaves the Up arrow
+# on zsh's normal per-line history instead of atuin's full-screen search.
+command -v atuin >/dev/null && eval "$(atuin init zsh --disable-up-arrow)"
 
 # --- Plugins (order matters; fast-syntax-highlighting MUST be sourced last) -
 ZSH_PLUGINS="$HOME/.config/zsh/plugins"
