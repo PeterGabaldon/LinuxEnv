@@ -556,14 +556,14 @@ write_starship() {
 # require a Nerd Font — the installer sets up UbuntuMono Nerd Font for this.
 
 format = """
-[┌──](bold color_fg0)\
-[](color_orange)\
-[󰌽](bg:color_orange fg:color_fg0)\
+[┌──](bold color_path)\
+[](color_id)\
+[󰌽](bold fg:#ffffff bg:color_id)\
 $username\
 $hostname\
-[](bg:color_yellow fg:color_orange)\
+[](bg:color_path fg:color_id)\
 $directory\
-[](fg:color_yellow bg:color_aqua)\
+[](fg:color_path bg:color_aqua)\
 $git_branch\
 $git_status\
 [](fg:color_aqua bg:color_blue)\
@@ -586,7 +586,7 @@ $pixi\
 $time\
 [ ](fg:color_bg1)\
 $line_break\
-[└─](bold color_fg0)$character"""
+[└─](bold color_path)$character"""
 
 palette = 'gruvbox_dark'
 
@@ -601,20 +601,22 @@ color_orange = '#d65d0e'
 color_purple = '#b16286'
 color_red = '#cc241d'
 color_yellow = '#d79921'
+color_id = '#3465a4'      # username@host box + $ prompt (Tango sky blue)
+color_path = '#d3d7cf'    # path box + frame lines (Tango aluminium)
 
 [username]
 show_always = true
-style_user = "bg:color_orange fg:color_fg0"
-style_root = "bg:color_orange fg:color_fg0"
+style_user = "bold fg:#ffffff bg:color_id"
+style_root = "bold fg:#ffffff bg:color_id"
 format = '[ $user]($style)'
 
 [hostname]
 ssh_only = false
-style = "bg:color_orange fg:color_fg0"
+style = "bold fg:#ffffff bg:color_id"
 format = '[@$hostname ]($style)'
 
 [directory]
-style = "fg:color_fg0 bg:color_yellow"
+style = "fg:color_bg1 bg:color_path"
 format = "[ $path ]($style)"
 truncation_length = 0      # 0 = show the full working-directory path
 truncate_to_repo = false
@@ -715,9 +717,9 @@ disabled = false
 # `$` instead of the usual arrow, on the `└─` line (Kali-style).
 [character]
 disabled = false
-success_symbol = '[\$](bold fg:color_green)'
+success_symbol = '[\$](bold fg:color_id)'
 error_symbol = '[\$](bold fg:color_red)'
-vimcmd_symbol = '[\$](bold fg:color_green)'
+vimcmd_symbol = '[\$](bold fg:color_id)'
 vimcmd_replace_one_symbol = '[\$](bold fg:color_purple)'
 vimcmd_replace_symbol = '[\$](bold fg:color_purple)'
 vimcmd_visual_symbol = '[\$](bold fg:color_yellow)'
