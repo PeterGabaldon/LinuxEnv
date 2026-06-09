@@ -169,6 +169,8 @@ pkg_for() {
     delta:apk)                    echo delta ;;
     delta:*)                      echo git-delta ;;
     starship:apt|starship:dnf|starship:yum) echo "" ;;  # not packaged → download
+    xz:apt)                       echo xz-utils ;;
+    xz:*)                         echo xz ;;
     *)                            echo "$1" ;;
   esac
 }
@@ -218,12 +220,21 @@ pick_release_tarball() {
   if [ -n "$musl" ]; then printf '%s\n' "$musl"; else printf '%s\n' "$cand" | head -n1; fi
 }
 
+# GNU tar's -J shells out to the external `xz` binary, which minimal images
+# (e.g. the ubuntu Docker image) omit — without it `tar -xJf` fails. Make sure
+# it is present, installing xz-utils when we can.
+ensure_xz() {
+  have xz && return 0
+  if can_sys_install; then pkg_install "$(pkg_for xz)" >/dev/null 2>&1 || true; fi
+  have xz
+}
+
 # Extract <archive> into <dir>, picking the right decompressor by extension.
 extract_archive() {
   local f="$1" d="$2"
   case "$f" in
     *.tar.gz|*.tgz) tar -xzf "$f" -C "$d" ;;
-    *.tar.xz)       tar -xJf "$f" -C "$d" ;;
+    *.tar.xz)       ensure_xz && tar -xJf "$f" -C "$d" ;;
     *.tar.bz2)      tar -xjf "$f" -C "$d" ;;
     *.tar)          tar -xf  "$f" -C "$d" ;;
     *.zip)          unzip_to "$f" "$d" ;;
@@ -234,6 +245,11 @@ extract_archive() {
 # Extract a zip without assuming unzip is installed.
 unzip_to() {
   local f="$1" d="$2"
+  # Minimal images (e.g. the ubuntu Docker image) ship none of these; install
+  # unzip when we have package-manager access so .zip assets still extract.
+  if ! have unzip && ! have bsdtar && ! have python3 && can_sys_install; then
+    pkg_install unzip >/dev/null 2>&1 || true
+  fi
   if   have unzip;   then unzip -qo "$f" -d "$d"
   elif have bsdtar;  then bsdtar -xf "$f" -C "$d"
   elif have python3; then ( cd "$d" && python3 -m zipfile -e "$f" . )
@@ -657,6 +673,10 @@ install_font() {
         | grep -oE '"browser_download_url"[: ]+"[^"]+/Hack\.tar\.xz"' \
         | sed -E 's/.*"(https[^"]+)".*/\1/' | head -n1)" || true
   if [ -z "$url" ]; then warn "could not find Hack Nerd Font release asset"; return 1; fi
+  if ! ensure_xz; then
+    warn "could not install Hack Nerd Font (xz is unavailable to extract .tar.xz)"
+    return 1
+  fi
   mkdir -p "$fdir"
   tmp="$(mktemp -d)"
   if dl "$url" -o "$tmp/Hack.tar.xz" && tar -xJf "$tmp/Hack.tar.xz" -C "$fdir" 2>/dev/null; then
