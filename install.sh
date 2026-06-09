@@ -776,8 +776,20 @@ set nolist
 set hlsearch
 set incsearch
 set number
-colorscheme afterglow
+
+" --- afterglow colorscheme --------------------------------------------------
+" afterglow only defines its palette inside a `has('gui_running') ||
+" &t_Co == 88 || &t_Co == 256` guard, so a terminal that doesn't advertise 256
+" colours (common under tmux/WSL) leaves Vim unthemed. Force 256 colours, and
+" switch on 24-bit true colour when the terminal reports it for the full range.
+set t_Co=256
+if has('termguicolors') && ($COLORTERM ==# 'truecolor' || $COLORTERM ==# '24bit')
+  set termguicolors
+endif
+" Must be set BEFORE `colorscheme` or it is ignored (lets the terminal
+" background show through instead of afterglow's own dark background).
 let g:afterglow_inherit_background=1
+colorscheme afterglow
 VIMRC
   mkdir -p "$HOME/.vim/colors"
   if [ -f "$HOME/.vim/colors/afterglow.vim" ]; then
