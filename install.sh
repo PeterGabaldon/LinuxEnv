@@ -524,14 +524,17 @@ _src "$ZSH_PLUGINS/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
 unset -f _src
 
 # fast-syntax-highlighting tints existing-path arguments (e.g. the /etc/passwd
-# in `vim /etc/passwd`) a dim magenta by default. Recolour them to a neutral
-# light grey that matches the prompt's path colour, underlined so a valid path
-# is still obvious while you type. F-Sy-H reads styles under the active theme
-# prefix (FAST_THEME_NAME, "default" out of the box), so the live key is
-# `defaultpath`; set both it and the bare `path` so the override always applies.
+# in `vim /etc/passwd`) magenta by default — `path` for files, `path-to-dir`
+# for directories. Recolour both to a neutral light grey that matches the
+# prompt's path colour, underlined so a valid path is still obvious while you
+# type. F-Sy-H reads styles under the active theme prefix (FAST_THEME_NAME,
+# "default" out of the box), so the live keys are `default…`; set both the
+# prefixed and bare forms so the override always applies.
 typeset -gA FAST_HIGHLIGHT_STYLES
 FAST_HIGHLIGHT_STYLES[path]='fg=#d3d7cf,underline'
 FAST_HIGHLIGHT_STYLES[defaultpath]='fg=#d3d7cf,underline'
+FAST_HIGHLIGHT_STYLES[path-to-dir]='fg=#d3d7cf,underline'
+FAST_HIGHLIGHT_STYLES[defaultpath-to-dir]='fg=#d3d7cf,underline'
 
 # --- Aliases ----------------------------------------------------------------
 # Safety: prompt before clobbering existing files.
