@@ -455,7 +455,8 @@ export PATH="$HOME/.local/bin:$PATH"
 export EDITOR="vim"
 export VISUAL="vim"
 # Dark themes for tools that support theming.
-export BAT_THEME="TwoDark"
+# Afterglow matches the Vim colorscheme (installed into bat's themes dir).
+export BAT_THEME="Afterglow"
 export FZF_DEFAULT_OPTS="--color=dark --height=40% --layout=reverse --border"
 
 # --- History ----------------------------------------------------------------
@@ -803,6 +804,33 @@ VIMRC
   fi
 }
 
+# Afterglow theme for bat — the Sublime .tmTheme the Vim colorscheme is based
+# on, so `cat` (bat) shares Vim's palette. Dropped into bat's themes dir and
+# compiled into its cache; selected via BAT_THEME="Afterglow" in ~/.zshrc.
+install_bat_theme() {
+  local bat_cmd themes_dir f
+  bat_cmd="$(command -v bat || command -v batcat || true)"
+  if [ -z "$bat_cmd" ]; then
+    warn "bat is unavailable; skipping Afterglow bat theme"
+    return 1
+  fi
+  themes_dir="$("$bat_cmd" --config-dir 2>/dev/null)/themes" || true
+  case "$themes_dir" in /themes) themes_dir="$HOME/.config/bat/themes" ;; esac
+  f="$themes_dir/Afterglow.tmTheme"
+  mkdir -p "$themes_dir"
+  if [ -f "$f" ]; then
+    skip "Afterglow bat theme"
+  elif dl https://raw.githubusercontent.com/YabataDesign/afterglow-theme/master/Afterglow.tmTheme -o "$f"; then
+    ok "Afterglow bat theme"
+  else
+    rm -f "$f"
+    warn "could not download Afterglow bat theme"
+    return 1
+  fi
+  # Rebuild bat's theme cache so BAT_THEME="Afterglow" resolves.
+  "$bat_cmd" cache --build >/dev/null 2>&1 || true
+}
+
 # Hack Nerd Font — provides the glyphs the prompt and eza icons expect.
 install_font() {
   local fdir="$HOME/.local/share/fonts" url tmp
@@ -834,6 +862,7 @@ install_dotfiles() {
   write_starship
   write_tmux
   write_vim
+  install_bat_theme
   install_font
 }
 

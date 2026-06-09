@@ -33,9 +33,10 @@ That's it. When it finishes, run `exec zsh` (or open a new terminal) and you're 
   `fd` (`find`), `ripgrep` (`grep`), `delta` (git pager), plus `tmux`, `vim`,
   `git`, and `curl`.
 - **Dotfiles:** `~/.zshrc`, `~/.config/starship.toml`, `~/.tmux.conf` (tpm +
-  gruvbox), `~/.vimrc` (with the afterglow colorscheme), all written from the
-  script itself. Handy aliases: `ls`→`eza`, `cat`→`bat`, `man`→`batman`,
-  `diff`→`batdiff`, and `cp`/`rm`/`mv` made interactive (`-i`).
+  gruvbox), `~/.vimrc` (afterglow colorscheme) plus a matching Afterglow theme for
+  `bat` (`~/.config/bat/themes/`), all written from the script itself. Handy
+  aliases: `ls`→`eza`, `cat`→`bat`, `man`→`batman`, `diff`→`batdiff`, and
+  `cp`/`rm`/`mv` made interactive (`-i`).
 - **Font:** Hack Nerd Font (so prompt/glyphs render correctly).
 
 It is a **CLI-only** setup — it never touches GUI/desktop settings. Dark theme
@@ -102,9 +103,9 @@ one thing you need to know to start using it.
 - **`atuin`** — replaces shell history with a searchable database that also records
   exit code, duration, and directory. *Why:* a far richer, fuzzy-searchable
   history. *Usage:* press `Ctrl-R` (or `Up`) for the full-screen history search.
-- **`bat`** — `cat` with syntax highlighting, line numbers, and git change markers.
-  *Why:* reading files in the terminal is much clearer. *Usage:* `bat file.py`
-  (aliased to `cat`).
+- **`bat`** — `cat` with syntax highlighting, line numbers, and git change markers,
+  themed with Afterglow to match Vim. *Why:* reading files in the terminal is much
+  clearer. *Usage:* `bat file.py` (aliased to `cat`).
 - **`bat-extras`** — wrappers that bring bat's highlighting to other commands:
   `batman`, `batdiff`, `prettybat`. *Why:* nicer man pages and diffs. *Usage:*
   `man ls` and `diff a b` are aliased to these.
