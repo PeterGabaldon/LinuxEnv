@@ -638,8 +638,8 @@ format = '[ $user ]($style)'
 [directory]
 style = "fg:color_fg0 bg:color_yellow"
 format = "[ $path ]($style)"
-truncation_length = 3
-truncation_symbol = "…/"
+truncation_length = 0      # 0 = show the full working-directory path
+truncate_to_repo = false
 
 [directory.substitutions]
 "Documents" = "󰈙 "
