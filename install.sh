@@ -478,10 +478,16 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # --- Key bindings -----------------------------------------------------------
 bindkey -e                                  # emacs-style keymap
+# Plain Left/Right move one character. zle may switch the terminal into
+# application cursor mode (common in WSL/tmux), where the arrows send ^[O{C,D}
+# instead of ^[[{C,D}, so bind both forms — otherwise the plain arrows would
+# fall through to the word-movement binding below.
+bindkey '^[[C'    forward-char              # Right
+bindkey '^[[D'    backward-char             # Left
+bindkey '^[OC'    forward-char
+bindkey '^[OD'    backward-char
 bindkey '^[[1;5C' forward-word              # Ctrl-Right: next word
 bindkey '^[[1;5D' backward-word             # Ctrl-Left:  previous word
-bindkey '^[OC'    forward-word
-bindkey '^[OD'    backward-word
 bindkey '^[[H'    beginning-of-line         # Home
 bindkey '^[[F'    end-of-line               # End
 bindkey '^[[3~'   delete-char               # Delete
