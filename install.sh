@@ -523,6 +523,13 @@ _src "$ZSH_PLUGINS/fzf-tab/fzf-tab.plugin.zsh"
 _src "$ZSH_PLUGINS/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
 unset -f _src
 
+# fast-syntax-highlighting tints existing-path arguments (e.g. the /etc/passwd
+# in `vim /etc/passwd`) a dim magenta by default. Recolour them to a neutral
+# light grey that matches the prompt's path colour, underlined so a valid path
+# is still obvious while you type. Set after the plugin loads so it wins.
+typeset -gA FAST_HIGHLIGHT_STYLES
+FAST_HIGHLIGHT_STYLES[path]='fg=#d3d7cf,underline'
+
 # --- Aliases ----------------------------------------------------------------
 # Safety: prompt before clobbering existing files.
 alias cp='cp -i'
