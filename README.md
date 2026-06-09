@@ -21,7 +21,7 @@ That's it. When it finishes, run `exec zsh` (or open a new terminal) and you're 
 
 ## Demo
 
-[![asciicast](https://asciinema.org/a/1215352.svg)](https://asciinema.org/a/1215352)
+<a href="https://asciinema.org/a/1215352" target="_blank" rel="noopener noreferrer"><img src="https://asciinema.org/a/1215352.svg" alt="asciicast"></a>
 
 ## What gets installed
 
