@@ -19,6 +19,10 @@ curl -L sh.pgj11.com | bash
 
 That's it. When it finishes, run `exec zsh` (or open a new terminal) and you're done.
 
+## Demo
+
+[![asciicast](https://asciinema.org/a/1215352.svg)](https://asciinema.org/a/1215352)
+
 ## What gets installed
 
 - **Shell:** `zsh`, set as the default login shell.
