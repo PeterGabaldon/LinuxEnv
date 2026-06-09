@@ -572,7 +572,7 @@ write_starship() {
 format = """
 [┌──](bold color_path)\
 [](color_id)\
-[󰌽](bold fg:#ffffff bg:color_id)\
+$os\
 $username\
 $hostname\
 [](bg:color_path fg:color_id)\
@@ -617,6 +617,34 @@ color_red = '#cc241d'
 color_yellow = '#d79921'
 color_id = '#3465a4'      # username@host box + $ prompt (Tango sky blue)
 color_path = '#d3d7cf'    # path box + frame lines (Tango aluminium)
+
+[os]
+disabled = false
+style = "bold fg:#ffffff bg:color_id"
+
+[os.symbols]
+Windows = "󰍲"
+Ubuntu = "󰕈"
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = "󰀵"
+Manjaro = ""
+Linux = "󰌽"
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+AOSC = ""
+Arch = "󰣇"
+Artix = "󰣇"
+EndeavourOS = ""
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+Pop = ""
 
 [username]
 show_always = true
