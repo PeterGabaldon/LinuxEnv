@@ -2,6 +2,12 @@
 
 [![CI](https://github.com/PeterGabaldon/LinuxEnv/actions/workflows/ci.yml/badge.svg)](https://github.com/PeterGabaldon/LinuxEnv/actions/workflows/ci.yml)
 
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?logo=ubuntu&logoColor=white)](https://github.com/PeterGabaldon/LinuxEnv/actions/workflows/ci.yml)
+[![Debian](https://img.shields.io/badge/Debian-A81D33?logo=debian&logoColor=white)](https://github.com/PeterGabaldon/LinuxEnv/actions/workflows/ci.yml)
+[![Fedora](https://img.shields.io/badge/Fedora-51A2DA?logo=fedora&logoColor=white)](https://github.com/PeterGabaldon/LinuxEnv/actions/workflows/ci.yml)
+[![Arch Linux](https://img.shields.io/badge/Arch%20Linux-1793D1?logo=archlinux&logoColor=white)](https://github.com/PeterGabaldon/LinuxEnv/actions/workflows/ci.yml)
+[![Alpine](https://img.shields.io/badge/Alpine-0D597F?logo=alpinelinux&logoColor=white)](https://github.com/PeterGabaldon/LinuxEnv/actions/workflows/ci.yml)
+
 One command turns a fresh Linux box into my preferred **zsh** command-line
 environment: a modern git-aware prompt, handy interactive zsh plugins, and a set
 of modern CLI tools — no reboot, no manual steps.
