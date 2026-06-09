@@ -21,8 +21,8 @@ That's it. When it finishes, run `exec zsh` (or open a new terminal) and you're 
 ## What gets installed
 
 - **Shell:** `zsh`, set as the default login shell.
-- **Prompt:** [Starship](https://starship.rs) — the Gruvbox Rainbow preset (OS,
-  directory, git, language/runtime versions and time as coloured powerline
+- **Prompt:** [Starship](https://starship.rs) — the Gruvbox Rainbow preset (a Linux glyph, `user@host`, directory, git,
+  language/runtime versions and time as coloured powerline
   segments) wrapped in a two-line, Kali-style frame (`┌── … ` / `└─$`, with `$`
   instead of the usual arrow). Inside a repo it shows branch plus ahead/behind and
   dirty/staged status.
@@ -72,7 +72,7 @@ one thing you need to know to start using it.
   globbing, and prompt theming than bash. *Why:* it's the foundation the plugins
   and prompt plug into. *Usage:* it becomes your default login shell, so new
   terminals open in it — run `exec zsh` to switch immediately after installing.
-- **Starship prompt** — the Gruvbox Rainbow preset (OS, directory, git, and
+- **Starship prompt** — the Gruvbox Rainbow preset (a Linux glyph, `user@host`, directory, git, and
   language/runtime versions as coloured powerline segments, plus the time) wrapped
   in a two-line, Kali-style frame ending in `└─$`. *Why:* your git state and
   toolchain versions are visible at a glance in a consistent gruvbox palette.

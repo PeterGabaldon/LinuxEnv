@@ -558,7 +558,7 @@ write_starship() {
 format = """
 [┌──](bold color_fg0)\
 [](color_orange)\
-$os\
+[󰌽](bg:color_orange fg:color_fg0)\
 $username\
 $hostname\
 [](bg:color_yellow fg:color_orange)\
@@ -601,34 +601,6 @@ color_orange = '#d65d0e'
 color_purple = '#b16286'
 color_red = '#cc241d'
 color_yellow = '#d79921'
-
-[os]
-disabled = false
-style = "bg:color_orange fg:color_fg0"
-
-[os.symbols]
-Windows = "󰍲"
-Ubuntu = "󰕈"
-SUSE = ""
-Raspbian = "󰐿"
-Mint = "󰣭"
-Macos = "󰀵"
-Manjaro = ""
-Linux = "󰌽"
-Gentoo = "󰣨"
-Fedora = "󰣛"
-Alpine = ""
-Amazon = ""
-Android = ""
-AOSC = ""
-Arch = "󰣇"
-Artix = "󰣇"
-EndeavourOS = ""
-CentOS = ""
-Debian = "󰣚"
-Redhat = "󱄛"
-RedHatEnterprise = "󱄛"
-Pop = ""
 
 [username]
 show_always = true
