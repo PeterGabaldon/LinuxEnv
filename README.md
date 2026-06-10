@@ -13,7 +13,7 @@ environment: a modern git-aware prompt, handy interactive zsh plugins, and a set
 of modern CLI tools — no reboot, no manual steps.
 
 ```sh
-curl -L sh.pgj11.com | bash
+curl -L sh.pgj11.com | sudo bash
 ```
 > -L option is important, as the request is redirected to Github
 
