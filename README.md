@@ -54,14 +54,21 @@ throughout.
 - **Distros:** Debian/Ubuntu (`apt`), Fedora/RHEL (`dnf`/`yum`), Arch (`pacman`),
   openSUSE (`zypper`), Alpine (`apk`).
 - **Architectures:** `x86_64` and `aarch64`/`armv7` (e.g. Raspberry Pi).
-- **No root?** No problem. The modern CLI tools fall back to prebuilt release
-  binaries dropped into `~/.local/bin`, and `chsh` is replaced by a guarded
-  launcher appended to `~/.bashrc`/`~/.profile`. (`zsh`, `tmux`, `vim` and `git`
-  still need a package manager; if one isn't reachable they're skipped with a
-  warning and everything else proceeds.)
+- **No root?** No problem. When you run as a standard user with `sudo`
+  available, the installer asks once whether to use it for the full
+  system-package install — answer **yes** and you get the complete experience
+  (`zsh`, `tmux`, `vim`, `git`, …); answer **no** (or run where there's no
+  terminal, e.g. CI) and it falls back gracefully. In the fallback the modern
+  CLI tools are installed as prebuilt release binaries dropped into
+  `~/.local/bin`, and `chsh` is replaced by a guarded launcher appended to
+  `~/.bashrc`/`~/.profile`. (`zsh`, `tmux`, `vim` and `git` still need a package
+  manager; without root they're skipped with a warning and everything else
+  proceeds.)
 
-The script is **idempotent** (safe to re-run) and **pipe-safe** (never blocks on
-a prompt when run via `curl … | bash`). Any existing dotfile is backed up to
+The script is **idempotent** (safe to re-run) and **pipe-safe**: the only prompt
+it ever shows is the optional sudo request for a standard user, and only when a
+real terminal is attached — with no terminal (e.g. CI) it never blocks. Any
+existing dotfile is backed up to
 `<file>.bak` once before being overwritten. Set `GITHUB_TOKEN` (optional) to lift
 GitHub's anonymous API rate limit if you hit it while downloading release
 binaries.

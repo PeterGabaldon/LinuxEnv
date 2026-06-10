@@ -13,7 +13,9 @@
 #     nothing but this single file. sh.pgj11.com redirects to its raw contents
 #     on GitHub.
 #   - Idempotent: safe to re-run; already-installed pieces are skipped.
-#   - Pipe-safe: when run via `curl ... | bash` it never blocks on a prompt.
+#   - Pipe-safe: when run via `curl ... | bash` with no terminal (e.g. CI) it
+#     never blocks on a prompt. When a real terminal is attached it will, as a
+#     standard user, offer once to use sudo for the full system-package install.
 #   - Cross-distro (apt/dnf/pacman/zypper/apk) and cross-arch (x86_64/aarch64/
 #     armv7). Falls back to user-local installs in ~/.local/bin without root.
 #   - CLI-only: never touches GUI/desktop settings.
@@ -49,6 +51,7 @@ ARCH=""              # x86_64|aarch64|armv7|armv6|<raw>
 INTERACTIVE=0        # 1 if stdin is a terminal (so prompting is OK)
 PRIV=none            # root|sudo|none
 SUDO=""              # "" when root or unprivileged, "sudo" when escalating
+SUDO_AVAILABLE=0     # 1 when a non-root user has the sudo command available
 
 detect_os() {
   if [ -r /etc/os-release ]; then
@@ -85,22 +88,82 @@ detect_interactive() {
   if [ -t 0 ]; then INTERACTIVE=1; else INTERACTIVE=0; fi
 }
 
-# Decide whether we can install system packages. We only ever use sudo if it
-# works without a password, or if we are interactive (so a single prompt is
-# acceptable). When piped and non-root, we silently fall back to ~/.local/bin.
+# Can we ask the user a question? True when stdin is a terminal, or when a
+# controlling terminal is reachable at /dev/tty — the latter is the case under
+# `curl … | bash`, where stdin is the pipe but a real terminal still exists.
+# This is what lets us prompt for sudo even when the script is piped.
+can_prompt() {
+  [ -t 0 ] && return 0
+  { true 0</dev/tty; } 2>/dev/null
+}
+
+# Print <prompt> on the terminal and read one line of input, falling back to
+# the controlling terminal (/dev/tty) when stdin is the pipe. Echoes the reply
+# on stdout so callers can capture it; returns non-zero on EOF.
+prompt_line() {
+  local prompt="$1" reply
+  if [ -t 0 ]; then
+    printf '%s' "$prompt" >&2
+    IFS= read -r reply || return 1
+  else
+    printf '%s' "$prompt" > /dev/tty
+    IFS= read -r reply < /dev/tty || return 1
+  fi
+  printf '%s\n' "$reply"
+}
+
+# Ask a yes/no question, defaulting to "no" on empty input or EOF.
+confirm() {
+  local reply
+  reply="$(prompt_line "$1")" || return 1
+  case "$reply" in
+    [Yy]|[Yy][Ee][Ss]) return 0 ;;
+    *)                  return 1 ;;
+  esac
+}
+
+# Detect the raw privilege situation. We use sudo silently only when it already
+# works without a password; a plain non-root user with sudo is recorded as
+# SUDO_AVAILABLE so maybe_request_sudo can offer to escalate. When piped and
+# non-root we otherwise fall back to ~/.local/bin.
 detect_privilege() {
   if [ "$(id -u)" -eq 0 ]; then
     PRIV=root; SUDO=""
   elif have sudo; then
+    SUDO_AVAILABLE=1
     if sudo -n true 2>/dev/null; then
-      PRIV=sudo; SUDO="sudo"
-    elif [ "$INTERACTIVE" -eq 1 ]; then
-      PRIV=sudo; SUDO="sudo"
+      PRIV=sudo; SUDO="sudo"   # passwordless sudo — use it without prompting
     else
-      PRIV=none; SUDO=""
+      PRIV=none; SUDO=""       # may be upgraded by maybe_request_sudo
     fi
   else
     PRIV=none; SUDO=""
+  fi
+}
+
+# A standard (non-root) user with sudo can unlock the full experience — zsh,
+# git, tmux, vim and the rest installed via the system package manager. When
+# that's the situation and we can reach a terminal, ask for permission to use
+# sudo. Approving authenticates once (cached for the rest of the run) and
+# switches us to system installs; declining keeps the user-local fallback.
+maybe_request_sudo() {
+  [ "$PRIV" = none ] || return 0          # already root or passwordless sudo
+  [ "$SUDO_AVAILABLE" -eq 1 ] || return 0 # no sudo to escalate with
+  [ -n "$PKG" ] || return 0               # root buys nothing without a pkg mgr
+  can_prompt || return 0                  # piped with no terminal — stay local
+
+  step "Standard user detected"
+  info "Without root, several tools (zsh, git, tmux, vim, …) can't be installed"
+  info "and the full environment won't be available."
+  if confirm "${C_BOLD}Use sudo to install the full environment? [y/N]${C_RESET} "; then
+    if sudo -v; then
+      PRIV=sudo; SUDO="sudo"
+      ok "sudo authorised — installing the full environment"
+    else
+      warn "sudo authentication failed; continuing without root"
+    fi
+  else
+    skip "continuing without root — some tools may be unavailable"
   fi
 }
 
@@ -1006,16 +1069,22 @@ main() {
   detect_privilege
   ensure_dirs
 
-  local mode="non-interactive (piped)" priv="$PRIV"
+  local mode="non-interactive (piped)"
   if [ "$INTERACTIVE" -eq 1 ]; then mode="interactive"; fi
-  if [ -n "$SUDO" ]; then priv="$priv (via sudo)"; fi
 
   step "LinuxEnv installer"
   info "OS:           $OS_NAME ($OS_ID)"
   info "Package mgr:  ${PKG:-none detected}"
   info "Architecture: $ARCH (uname -m: $(uname -m))"
-  info "Privilege:    $priv"
   info "Mode:         $mode"
+
+  # Offer to escalate before reporting the final privilege/install path, so a
+  # standard user can opt into the full, system-package install.
+  maybe_request_sudo
+
+  local priv="$PRIV"
+  if [ -n "$SUDO" ]; then priv="$priv (via sudo)"; fi
+  info "Privilege:    $priv"
   if can_sys_install; then
     info "Install path: system packages via $PKG${SUDO:+ (sudo)}, user-local fallback"
   else
