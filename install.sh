@@ -1082,8 +1082,14 @@ main() {
   # standard user can opt into the full, system-package install.
   maybe_request_sudo
 
-  local priv="$PRIV"
-  if [ -n "$SUDO" ]; then priv="$priv (via sudo)"; fi
+  # Report the final privilege state, naming the user it applies to.
+  local who; who="${USER:-$(id -un)}"
+  local priv
+  case "$PRIV" in
+    root) priv="root (user: $who)" ;;
+    sudo) priv="$who (granted root via sudo)" ;;
+    *)    priv="$who (unprivileged — no root)" ;;
+  esac
   info "Privilege:    $priv"
   if can_sys_install; then
     info "Install path: system packages via $PKG${SUDO:+ (sudo)}, user-local fallback"
