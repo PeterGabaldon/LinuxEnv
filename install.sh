@@ -554,6 +554,8 @@ bindkey '^[[1;5D' backward-word             # Ctrl-Left:  previous word
 bindkey '^[[H'    beginning-of-line         # Home
 bindkey '^[[F'    end-of-line               # End
 bindkey '^[[3~'   delete-char               # Delete
+bindkey '^[[3;5~' kill-word                 # Ctrl-Delete:    delete next word
+bindkey '^H'      backward-kill-word        # Ctrl-Backspace: delete previous word
 
 # --- Prompt & tool initialisation ------------------------------------------
 command -v starship >/dev/null && eval "$(starship init zsh)"
